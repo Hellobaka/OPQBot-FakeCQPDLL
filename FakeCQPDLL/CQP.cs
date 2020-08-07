@@ -95,7 +95,7 @@ namespace Sdk.Cqp.Core
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
             LogHelper.WriteLine(pluginname, CQLogLevel.InfoSuccess, "[↑]发送消息", $"群号:{groupid} 消息:{text}");
             SendRequest(url, data.ToString());
-            return 0;
+            return Save.MsgList.Count+1;
         }
 
         [DllExport(ExportName = "CQ_sendPrivateMsg", CallingConvention = CallingConvention.StdCall)]
@@ -146,9 +146,9 @@ namespace Sdk.Cqp.Core
                                     break;
                                 }
                                 string path = item.Items["file"], base64buf = string.Empty;
-                                if (File.Exists(path))
+                                if (File.Exists("data\\image\\" + path))
                                 {
-                                    base64buf = BinaryReaderExpand.ImageToBase64(path);
+                                    base64buf = BinaryReaderExpand.ImageToBase64("data\\image\\" + path);
                                 }
                                 data["picBase64Buf"] = base64buf;
                             }
@@ -179,16 +179,22 @@ namespace Sdk.Cqp.Core
         [DllExport(ExportName = "CQ_deleteMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_deleteMsg(int authCode, long msgId)
         {
-            //待找到实现方法
+            var p = Save.MsgList;
+            var c = Save.MsgList.Find(x => x.MsgId == msgId);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=RevokeMsg&timeout=10";
             JObject data = new JObject
             {
-                {"GroupID",0},
-                {"MsgSeq",msgId},
-                {"MsgRandom",0}
+                {"GroupID",c.groupid},
+                {"MsgSeq",c.Seq},
+                {"MsgRandom",c.MsgRandom}
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
-            return Convert.ToInt32(ret["ret"].ToString());
+            return Convert.ToInt32(ret["Ret"].ToString());
+        }
+        [DllExport(ExportName = "AddMsgToSave", CallingConvention = CallingConvention.StdCall)]
+        public static void AddMsgToSave(Message msg)
+        {
+            Save.MsgList.Add(msg);
         }
 
         [DllExport(ExportName = "CQ_sendLikeV2", CallingConvention = CallingConvention.StdCall)]
@@ -336,7 +342,7 @@ namespace Sdk.Cqp.Core
         [DllExport(ExportName = "CQ_setGroupLeave", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupLeave(int authCode, long groupId, bool isDisband)
         {
-            //未找到实现接口
+            //待找到实现方法
             return -1;
         }
 

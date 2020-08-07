@@ -4,7 +4,7 @@
 - [x] CQ_sendPrivateMsg(只做了文字、at和图片的CQ码的解析)
 - [x] CQ_sendGroupMsg(只做了文字、at和图片的CQ码的解析)
 - [ ] CQ_sendDiscussMsg(讨论组已经不存在了)
-- [ ] CQ_deleteMsg(待实现)
+- [x] CQ_deleteMsg
 - [x] CQ_sendLikeV2
 - [x] CQ_getCookiesV2
 - [ ] CQ_getRecordV2(待实现)

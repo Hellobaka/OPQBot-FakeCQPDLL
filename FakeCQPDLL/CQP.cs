@@ -259,8 +259,16 @@ namespace Sdk.Cqp.Core
         [DllExport(ExportName = "CQ_setGroupKick", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupKick(int authCode, long groupId, long qqId, bool refuses)
         {
-            //待实现
-            return -1;
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GroupMgr&timeout=10";
+            JObject data = new JObject
+            {
+                {"ActionType",3},
+                {"GroupID",groupId},
+                {"ActionUserID",qqId},
+                {"Content","" }
+            };
+            JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
+            return Convert.ToInt32(ret["Ret"].ToString());
         }
 
         [DllExport(ExportName = "CQ_setGroupBan", CallingConvention = CallingConvention.StdCall)]
@@ -342,8 +350,16 @@ namespace Sdk.Cqp.Core
         [DllExport(ExportName = "CQ_setGroupLeave", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupLeave(int authCode, long groupId, bool isDisband)
         {
-            //待找到实现方法
-            return -1;
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GroupMgr&timeout=10";
+            JObject data = new JObject
+            {
+                {"ActionType",2},
+                {"GroupID",groupId},
+                {"ActionUserID",0},
+                {"Content","" }
+            };
+            JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
+            return Convert.ToInt32(ret["Ret"].ToString());
         }
 
         [DllExport(ExportName = "CQ_setDiscussLeave", CallingConvention = CallingConvention.StdCall)]

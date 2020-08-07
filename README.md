@@ -12,7 +12,7 @@
 - [x] CQ_getAppDirectory
 - [x] CQ_getLoginQQ
 - [x] CQ_getLoginNick
-- [ ] CQ_setGroupKick(待实现)
+- [x] CQ_setGroupKick
 - [x] CQ_setGroupBan
 - [ ] CQ_setGroupAdmin(未找到此接口)
 - [ ] CQ_setGroupSpecialTitle(未找到此接口)
@@ -20,7 +20,7 @@
 - [ ] CQ_setGroupAnonymousBan(未找到此接口)
 - [ ] CQ_setGroupAnonymous(未找到此接口)
 - [x] CQ_setGroupCard
-- [ ] CQ_setGroupLeave(待实现)
+- [x] CQ_setGroupLeave
 - [ ] CQ_setDiscussLeave(讨论组已经不存在了)
 - [ ] CQ_setFriendAddRequest(待实现)
 - [ ] CQ_setGroupAddRequestV2(待实现)

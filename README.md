@@ -1,5 +1,5 @@
 # OPQBot-FakeCQPDLL
-用于 [OPQBot-Native](https://github.com/Hellobaka/OPQBot-Native) 的伪造CQP.dll
+用于 [OPQBot-Native](https://github.com/Hellobaka/OPQBot-Native) 的伪造CQP.dll，使用了[Native.FrameWork](https://github.com/Jie2GG/Native.Framework)的部分CQ码处理函数
 ## 接口实现情况
 - [x] CQ_sendPrivateMsg(只做了文字、at和图片的CQ码的解析)
 - [x] CQ_sendGroupMsg(只做了文字、at和图片的CQ码的解析)

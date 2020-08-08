@@ -21,6 +21,11 @@ namespace Deserizition
             this.text = text;
         }
     }
+    public class Requests
+    {
+        public string type;
+        public string json;
+    }
     public static class Save
     {
         public static string url { get; set; }

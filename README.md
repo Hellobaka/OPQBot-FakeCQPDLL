@@ -22,8 +22,8 @@
 - [x] CQ_setGroupCard
 - [x] CQ_setGroupLeave
 - [ ] CQ_setDiscussLeave(讨论组已经不存在了)
-- [ ] CQ_setFriendAddRequest(待实现)
-- [ ] CQ_setGroupAddRequestV2(待实现)
+- [x] CQ_setFriendAddRequest
+- [x] CQ_setGroupAddRequestV2
 - [x] CQ_addLog
 - [ ] CQ_setFatal(待实现)
 - [x] CQ_getGroupMemberInfoV2

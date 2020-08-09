@@ -502,7 +502,7 @@ namespace Sdk.Cqp.Core
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=friendlist.GetTroopMemberListReq&timeout=10";
             JObject data = new JObject
             {
-                {"GroupUin",0},
+                {"GroupUin",groupId},
                 {"LastUin",0}
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));

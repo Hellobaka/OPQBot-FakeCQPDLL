@@ -32,69 +32,12 @@ namespace Sdk.Cqp.Core
                 {"toUser",groupid},
                 {"sendToType",2},
                 {"groupid",0},
-                {"fileMd5","" }
+                {"fileMd5","" },
+                {"atUser",0 }
             };
-            bool Picflag = false, Atflag = false; ;
-            foreach (var item in cqCodeList)
-            {
-                switch (item.Function)
-                {
-                    case CQFunction.At://[CQ:at,qq=xxxx]
-                        {
-                            if (!data.ContainsKey("atUser"))
-                            {
-                                data.Add("atUser", Convert.ToInt64(item.Items["qq"]));
-                            }
-                            else if (data["atUser"].ToString() == "0")
-                                data["atUser"] = Convert.ToInt64(item.Items["qq"]);
-                            Atflag = true;
-                            break;
-                        }
-                    case CQFunction.Image:
-                        {
-                            if (!data.ContainsKey("content")) data.Add("content", "");
-                            if (!data.ContainsKey("picBase64Buf")) data.Add("picBase64Buf", "");
-                            if (!data.ContainsKey("picUrl")) data.Add("picUrl", "");
-                            if (!data.ContainsKey("atUser")) data.Add("atUser", 0);
-                            if (!data.ContainsKey("picUrl")) data.Add("picUrl", "");
-                            if (item.Items.ContainsKey("url"))
-                                data["picUrl"] = item.Items["url"];
-                            else if (item.Items.ContainsKey("file"))
-                            {
-                                if (File.Exists("data\\image\\" + item.Items["file"] + ".cqimg"))
-                                {
-                                    IniConfig ini = new IniConfig("data\\image\\" + item.Items["file"] + ".cqimg"); ini.Load();
-                                    data["picUrl"] = ini.Object["image"]["url"].ToString();
-                                    Picflag = true;
-                                    break;
-                                }
-                                string path = item.Items["file"], base64buf = string.Empty;
-                                if (File.Exists("data\\image\\" + path))
-                                {
-                                    base64buf = BinaryReaderExpand.ImageToBase64("data\\image\\" + path);
-                                }
-                                data["picBase64Buf"] = base64buf;
-                            }
-                            else if (item.Items.ContainsKey("md5"))
-                            {
-                                data["fileMd5"] = item.Items["file"];
-                            }
-                            Picflag = true;
-                            break;
-                        }
-                }
-            }
-            string filtered = Regex.Replace(text, @"\[CQ.*\]", "");
-            if (!string.IsNullOrEmpty(filtered)) data["content"] = filtered;
-            if (Picflag)
-                data.Add("sendMsgType", "PicMsg");
-            else if (Atflag)
-                data.Add("sendMsgType", "AtMsg");
-            else
-                data.Add("sendMsgType", "TextMsg");
-            if (!data.ContainsKey("atUser")) data.Add("atUser", 0);
+            CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
-            LogHelper.WriteLine(pluginname, CQLogLevel.InfoSuccess, "[↑]发送消息", $"群号:{groupid} 消息:{text}");
+            LogHelper.WriteLine(pluginname, CQLogLevel.InfoSuccess, "[↑]发送消息", $"群号:{groupid} 消息:{Marshal.PtrToStringAnsi(msg)}");
             SendRequest(url, data.ToString());
             return Save.MsgList.Count+1;
         }
@@ -110,69 +53,12 @@ namespace Sdk.Cqp.Core
                 {"toUser",qqId},
                 {"sendToType",1},
                 {"groupid",0},
-                {"fileMd5","" }
+                {"fileMd5","" },
+                {"atUser",0 }
             };
-            bool Picflag = false, Atflag = false; ;
-            foreach (var item in cqCodeList)
-            {
-                switch (item.Function)
-                {
-                    case CQFunction.At://[CQ:at,qq=xxxx]
-                        {
-                            if (!data.ContainsKey("atUser"))
-                            {
-                                data.Add("atUser", Convert.ToInt64(item.Items["qq"]));
-                            }
-                            else if (data["atUser"].ToString() == "0")
-                                data["atUser"] = Convert.ToInt64(item.Items["qq"]);
-                            Atflag = true;
-                            break;
-                        }
-                    case CQFunction.Image:
-                        {
-                            if (!data.ContainsKey("content")) data.Add("content", "");
-                            if (!data.ContainsKey("picBase64Buf")) data.Add("picBase64Buf", "");
-                            if (!data.ContainsKey("picUrl")) data.Add("picUrl", "");
-                            if (!data.ContainsKey("atUser")) data.Add("atUser", 0);
-                            if (!data.ContainsKey("picUrl")) data.Add("picUrl", "");
-                            if (item.Items.ContainsKey("url"))
-                                data["picUrl"] = item.Items["url"];
-                            else if (item.Items.ContainsKey("file"))
-                            {
-                                if (File.Exists("data\\image\\" + item.Items["file"] + ".cqimg"))
-                                {
-                                    IniConfig ini = new IniConfig("data\\image\\" + item.Items["file"] + ".cqimg"); ini.Load();
-                                    data["picUrl"] = ini.Object["image"]["url"].ToString();
-                                    Picflag = true;
-                                    break;
-                                }
-                                string path = item.Items["file"], base64buf = string.Empty;
-                                if (File.Exists("data\\image\\" + path))
-                                {
-                                    base64buf = BinaryReaderExpand.ImageToBase64("data\\image\\" + path);
-                                }
-                                data["picBase64Buf"] = base64buf;
-                            }
-                            else if (item.Items.ContainsKey("md5"))
-                            {
-                                data["fileMd5"] = item.Items["file"];
-                            }
-                            Picflag = true;
-                            break;
-                        }
-                }
-            }
-            string filtered = Regex.Replace(text, @"\[CQ.*\]", "");
-            if (!string.IsNullOrEmpty(filtered)) data["content"] = filtered;
-            if (Picflag)
-                data.Add("sendMsgType", "PicMsg");
-            else if (Atflag)
-                data.Add("sendMsgType", "AtMsg");
-            else
-                data.Add("sendMsgType", "TextMsg");
-            if (!data.ContainsKey("atUser")) data.Add("atUser", 0);
+            CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            LogHelper.WriteLine(pluginname, CQLogLevel.InfoSuccess, "[↑]发送消息", $"QQ:{qqId} 消息:{text}");
+            LogHelper.WriteLine(pluginname, CQLogLevel.InfoSuccess, "[↑]发送消息", $"QQ:{qqId} 消息:{Marshal.PtrToStringAnsi(msg)}");
             SendRequest(url, data.ToString());
             return 0;
         }

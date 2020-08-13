@@ -94,6 +94,11 @@ namespace Sdk.Cqp.Core
                             text = Regex.Replace(text, "\\[CQ:face,id=(\\d*)\\]", "[表情$1]");
                             break;
                         }
+                    case CQFunction.Emoji:
+                        {
+
+                            break;
+                        }
                 }
             }
             string filtered = Regex.Replace(text, @"\[CQ.*\]", "");

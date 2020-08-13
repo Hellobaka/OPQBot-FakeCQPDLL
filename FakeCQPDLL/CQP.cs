@@ -455,7 +455,7 @@ namespace Sdk.Cqp.Core
                 BinaryWriterExpand.Write_Ex(binaryWriter, 1);
 
                 BinaryWriterExpand.Write_Ex(binaryWriterMain, (short)stream.Length);
-                binaryWriter.Write(stream.ToArray());
+                binaryWriterMain.Write(stream.ToArray());
             }
             return Marshal.StringToHGlobalAnsi(Convert.ToBase64String(streamMain.ToArray()));
         }
@@ -482,7 +482,7 @@ namespace Sdk.Cqp.Core
                 BinaryWriterExpand.Write_Ex(binaryWriter, item["GroupName"].ToString());
 
                 BinaryWriterExpand.Write_Ex(binaryWriterMain, (short)stream.Length);
-                binaryWriter.Write(stream.ToArray());
+                binaryWriterMain.Write(stream.ToArray());
             }
             return Marshal.StringToHGlobalAnsi(Convert.ToBase64String(streamMain.ToArray()));
         }
@@ -544,7 +544,7 @@ namespace Sdk.Cqp.Core
             BinaryWriter binaryWriter = new BinaryWriter(stream);
             BinaryWriterExpand.Write_Ex(binaryWriter, Convert.ToInt64(targetgroup["GroupId"].ToString()));
             BinaryWriterExpand.Write_Ex(binaryWriter, targetgroup["GroupName"].ToString());
-            return Marshal.StringToHGlobalAnsi("未实现的接口");
+            return Marshal.StringToHGlobalAnsi(Convert.ToBase64String(stream.ToArray()));
         }
 
         [DllExport(ExportName = "CQ_getFriendList", CallingConvention = CallingConvention.StdCall)]
@@ -571,7 +571,7 @@ namespace Sdk.Cqp.Core
                 BinaryWriterExpand.Write_Ex(binaryWriter, item["Remark"].ToString());
 
                 BinaryWriterExpand.Write_Ex(binaryWriterMain, (short)stream.Length);
-                binaryWriter.Write(stream.ToArray());
+                binaryWriterMain.Write(stream.ToArray());
             }
             return Marshal.StringToHGlobalAnsi(Convert.ToBase64String(streamMain.ToArray()));
         }

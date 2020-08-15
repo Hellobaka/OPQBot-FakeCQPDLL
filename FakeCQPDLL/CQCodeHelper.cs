@@ -6,6 +6,7 @@ using Sdk.Cqp.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Sdk.Cqp.Core
@@ -14,7 +15,8 @@ namespace Sdk.Cqp.Core
     {
         public static void Progeress(List<CQCode> cqCodeList,ref JObject data,ref string text)
         {
-            bool Picflag = false, Voiceflag = false; ;
+            bool Picflag = false, Voiceflag = false,Atflag=false;
+            //List<long> atQQs = new List<long>();
             foreach (var item in cqCodeList)
             {
                 switch (item.Function)
@@ -22,7 +24,9 @@ namespace Sdk.Cqp.Core
                     case CQFunction.At://[CQ:at,qq=xxxx]
                         {
                             if (!data.ContainsKey("content")) data.Add("content","");
-                            text = text.Replace(CQApi.CQCode_At(Convert.ToInt64(item.Items["qq"])).ToSendString(), $"[ATUSER({Convert.ToInt64(item.Items["qq"])})]");
+                            text = text.Replace(item.ToSendString(), $"[ATUSER({Convert.ToInt64(item.Items["qq"])})]");
+                            //atQQs.Add(Convert.ToInt64(item.Items["qq"]));
+                            //Atflag = true;
                             break;
                         }
                     case CQFunction.Image:
@@ -96,7 +100,8 @@ namespace Sdk.Cqp.Core
                         }
                     case CQFunction.Emoji:
                         {
-
+                            int src =Convert.ToInt32(item.Items["id"]);
+                            text = text.Replace(item.ToSendString(), Encoding.UTF32.GetString(BitConverter.GetBytes(src)));
                             break;
                         }
                 }

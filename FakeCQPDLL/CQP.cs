@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Linq;
 
 namespace Sdk.Cqp.Core

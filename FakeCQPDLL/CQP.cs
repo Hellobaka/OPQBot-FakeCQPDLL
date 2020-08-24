@@ -467,21 +467,21 @@ namespace Sdk.Cqp.Core
             {
                 {"NextToken",""}
             };
-            JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
+            JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));//获取请求之后的消息
             MemoryStream streamMain = new MemoryStream();
-            BinaryWriter binaryWriterMain = new BinaryWriter(streamMain);
+            BinaryWriter binaryWriterMain = new BinaryWriter(streamMain);//最终要进行编码的字节流
             JArray grouplist = JArray.Parse(ret["TroopList"].ToString());
-            BinaryWriterExpand.Write_Ex(binaryWriterMain, grouplist.Count);
+            BinaryWriterExpand.Write_Ex(binaryWriterMain, grouplist.Count);//群数量
             foreach(var item in grouplist)
             {
                 MemoryStream stream = new MemoryStream();
-                BinaryWriter binaryWriter = new BinaryWriter(stream);
+                BinaryWriter binaryWriter = new BinaryWriter(stream);//临时字节流,用于统计每个群信息的字节数量
 
                 BinaryWriterExpand.Write_Ex(binaryWriter, Convert.ToInt64(item["GroupId"].ToString()));
                 BinaryWriterExpand.Write_Ex(binaryWriter, item["GroupName"].ToString());
 
-                BinaryWriterExpand.Write_Ex(binaryWriterMain, (short)stream.Length);
-                binaryWriterMain.Write(stream.ToArray());
+                BinaryWriterExpand.Write_Ex(binaryWriterMain, (short)stream.Length);//将临时字节流的字节长度写入主字节流
+                binaryWriterMain.Write(stream.ToArray());//写入数据
             }
             return Marshal.StringToHGlobalAnsi(Convert.ToBase64String(streamMain.ToArray()));
         }

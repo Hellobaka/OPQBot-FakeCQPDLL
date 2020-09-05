@@ -71,7 +71,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DllImportTest\CQP.csproj">
+    <ProjectReference Include="..\FakeCQPDLL\CQP.csproj">
       <Project>{166D3391-5E90-4C64-BCA6-FBF987500078}</Project>
       <Name>CQP</Name>
     </ProjectReference>

@@ -15,7 +15,7 @@ namespace Sdk.Cqp.Core
     {
         public static void Progeress(List<CQCode> cqCodeList,ref JObject data,ref string text)
         {
-            bool Picflag = false, Voiceflag = false,Atflag=false;
+            bool Picflag = false, Voiceflag = false;
             //List<long> atQQs = new List<long>();
             foreach (var item in cqCodeList)
             {
@@ -58,6 +58,7 @@ namespace Sdk.Cqp.Core
                                 data["fileMd5"] = item.Items["file"];
                             }
                             Picflag = true;
+                            text = Regex.Replace(text, @"\[CQ:image,.*?\]", "[PICFLAG]");
                             break;
                         }
                     case CQFunction.Record:

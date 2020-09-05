@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>..\..\OPQBot-Native\Launcher\bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -149,8 +149,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Deserizition\Deserizition.csproj">
-      <Project>{18cc2e4a-e049-4a31-8a52-0000371a558b}</Project>
+    <ProjectReference Include="..\..\OPQBot-Native\Deserizition\Deserizition.csproj">
+      <Project>{18CC2E4A-E049-4A31-8A52-0000371A558B}</Project>
       <Name>Deserizition</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sdk\Sdk.csproj">

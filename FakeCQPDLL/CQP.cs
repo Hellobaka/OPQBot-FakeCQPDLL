@@ -13,6 +13,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Linq;
+using System.Threading;
 
 namespace Sdk.Cqp.Core
 {
@@ -603,7 +604,9 @@ namespace Sdk.Cqp.Core
                 UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36",
                 TimeOut = 10000
             };
-            return http.UploadString(url, data.ToString());
+            string tmp= http.UploadString(url, data.ToString());
+            Thread.Sleep(1000);
+            return tmp;
         }
     }
 }

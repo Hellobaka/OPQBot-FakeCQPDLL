@@ -153,6 +153,10 @@
       <Project>{18CC2E4A-E049-4A31-8A52-0000371A558B}</Project>
       <Name>Deserizition</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OPQBot-Native\SocketIO\SocketIOClient.csproj">
+      <Project>{352C9BC1-F74C-4741-A09D-7227BC60C057}</Project>
+      <Name>SocketIOClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sdk\Sdk.csproj">
       <Project>{d7a958b3-79d9-49f8-8bb4-9619bab6ecba}</Project>
       <Name>Sdk</Name>

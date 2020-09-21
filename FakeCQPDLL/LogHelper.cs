@@ -1,7 +1,7 @@
-﻿using Sdk.Cqp.Enum;
+﻿using Launcher.Sdk.Cqp.Enum;
 using System;
 
-namespace Sdk.Cqp.Core
+namespace CQP
 {
     public static class LogHelper
     {        

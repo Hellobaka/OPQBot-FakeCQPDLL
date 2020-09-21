@@ -1,15 +1,15 @@
 ﻿using Native.Tool.IniConfig;
 using Newtonsoft.Json.Linq;
-using Sdk.Cqp.Enum;
-using Sdk.Cqp.Expand;
-using Sdk.Cqp.Model;
+using Launcher.Sdk.Cqp.Enum;
+using Launcher.Sdk.Cqp.Expand;
+using Launcher.Sdk.Cqp.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Sdk.Cqp.Core
+namespace CQP
 {
     public static class CQCodeHelper
     {

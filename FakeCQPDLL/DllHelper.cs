@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Sdk.Cqp.Core
+namespace CQP
 {
     public class DllHelper
     {

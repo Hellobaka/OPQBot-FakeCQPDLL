@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using Deserizition;
 
 namespace CQP
 {
@@ -80,6 +82,12 @@ namespace CQP
                                     catch
                                     {
                                         string base64Str;
+                                        string extension = new FileInfo(voicepath).Extension;
+                                        if (extension != ".silk")
+                                        {
+                                            if (SilkEncode(voicepath, extension))
+                                                voicepath = voicepath.Replace(extension, ".silk");
+                                        }
                                         using (FileStream fsRead = new FileStream(voicepath, FileMode.Open))
                                         {
                                             int fsLen = (int)fsRead.Length;
@@ -115,6 +123,78 @@ namespace CQP
                 data.Add("sendMsgType", "VoiceMsg");
             else
                 data.Add("sendMsgType", "TextMsg");
+        }
+
+        private static bool SilkEncode(string voicepath,string extension)
+        {
+            if (!Directory.Exists("tools"))
+            {
+                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...","tools目录丢失，无法继续");
+                return false; 
+            }
+            if(!File.Exists(@"tools\silk_v3_encoder.exe"))
+            {
+                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools\\silk_v3_encoder.exe 文件丢失，无法继续");
+                return false;
+            }
+            if (!File.Exists(@"tools\ffmpeg.exe"))
+            {
+                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools\\ffmpeg.exe 文件丢失，无法继续");
+                return false;
+            }
+            string output;
+            RunCMDCommand($"tools\\ffmpeg.exe -y -i \"{voicepath}\" -f s16le -ar 24000 -ac 1 \"{voicepath.Replace(extension, ".pcm")}\"",out output);
+            if (!Directory.Exists("logs"))
+                Directory.CreateDirectory("logs");
+            string filePath = "logs\\"+ DateTime.Now.ToString("yyyyMMddHHmmss")+"_pcm.log";
+            IniConfig ini = new IniConfig(filePath);
+            ini.Object.Add(new Native.Tool.IniConfig.Linq.ISection("OutPut"));
+            ini.Object["OutPut"]["Details"] = new Native.Tool.IniConfig.Linq.IValue(output);
+            ini.Save();
+            if (output.Contains("Invalid data found when processing input"))
+            {
+                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "格式错误", "...", "接受的音频可能不是FFmpeg可转换的格式");
+                return false;
+            }
+            if(!output.Contains("video:0kB"))
+            {                
+                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "未知错误", "...", $"FFmpeg输出已保存至{filePath}");
+                return false;
+            }
+            string filepath = voicepath.Replace(extension, ".pcm");
+            RunCMDCommand($"tools\\silk_v3_encoder.exe \"{filepath}\" \"{filepath.Replace(".pcm", ".silk")}\" -tencent -quiet",out output);
+            filePath = "logs\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_silk.log";
+            ini = new IniConfig(filePath);
+            ini.Object.Add(new Native.Tool.IniConfig.Linq.ISection("OutPut"));
+            ini.Object["OutPut"]["Details"] = new Native.Tool.IniConfig.Linq.IValue(output);
+            ini.Save();
+            return true;
+        }
+        private static readonly string CMDPath = Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\cmd.exe";
+        private static void RunCMDCommand(string Command, out string OutPut)
+        {
+            using (Process pc = new Process())
+            {
+                Command = Command.Trim().TrimEnd('&') + "&exit";
+
+                pc.StartInfo.FileName = CMDPath;
+                pc.StartInfo.CreateNoWindow = true;
+                pc.StartInfo.RedirectStandardError = true;
+                pc.StartInfo.RedirectStandardInput = true;
+                pc.StartInfo.RedirectStandardOutput = true;
+                pc.StartInfo.UseShellExecute = false;
+                pc.Start();
+
+                pc.StandardInput.WriteLine(Command);
+                pc.StandardInput.AutoFlush = true;
+                string a = pc.StandardOutput.ReadToEnd();
+                string b=pc.StandardError.ReadToEnd();
+                OutPut = a + b;
+                int P = OutPut.IndexOf(Command) + Command.Length;
+                OutPut = OutPut.Substring(P, OutPut.Length - P - 3);
+                pc.WaitForExit();
+                pc.Close();
+            }
         }
     }
 }

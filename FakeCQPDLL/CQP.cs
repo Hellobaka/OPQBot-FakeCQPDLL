@@ -24,15 +24,12 @@ namespace CQP
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
             string text = Marshal.PtrToStringAnsi(msg);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2&timeout=10";
             List<CQCode> cqCodeList = CQCode.Parse(text);
             JObject data = new JObject
             {
-                {"toUser",groupid},
-                {"sendToType",2},
-                {"groupid",0},
-                {"fileMd5","" },
-                {"atUser",0 }
+                {"ToUserUid",groupid},
+                {"SendToType",2}
             };
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
@@ -44,15 +41,12 @@ namespace CQP
         public static int CQ_sendPrivateMsg(int authCode, long qqId, IntPtr msg)
         {
             string text = Marshal.PtrToStringAnsi(msg);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2&timeout=10";
             List<CQCode> cqCodeList = CQCode.Parse(text);
             JObject data = new JObject
             {
-                {"toUser",qqId},
-                {"sendToType",1},
-                {"groupid",0},
-                {"fileMd5","" },
-                {"atUser",0 }
+                {"ToUserUid",qqId},
+                {"SendToType",1}
             };
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;

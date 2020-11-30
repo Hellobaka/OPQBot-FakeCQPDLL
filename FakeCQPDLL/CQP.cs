@@ -24,7 +24,7 @@ namespace CQP
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
             string text = Marshal.PtrToStringAnsi(msg);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2";
             List<CQCode> cqCodeList = CQCode.Parse(text);
             JObject data = new JObject
             {
@@ -41,7 +41,7 @@ namespace CQP
         public static int CQ_sendPrivateMsg(int authCode, long qqId, IntPtr msg)
         {
             string text = Marshal.PtrToStringAnsi(msg);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2";
             List<CQCode> cqCodeList = CQCode.Parse(text);
             JObject data = new JObject
             {
@@ -59,7 +59,7 @@ namespace CQP
         {
             var p = Save.MsgList;
             var c = Save.MsgList.Find(x => x.MsgId == msgId);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=RevokeMsg&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=RevokeMsg";
             JObject data = new JObject
             {
                 {"GroupID",c.groupid},
@@ -85,7 +85,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_sendLikeV2", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_sendLikeV2(int authCode, long qqId, int count)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=QQZan&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=QQZan";
             JObject data = new JObject
             {
                 {"UserID",qqId}
@@ -103,7 +103,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_getCookiesV2", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getCookiesV2(int authCode, IntPtr domain)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetUserCook&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetUserCook";
             JObject data = new JObject();
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
@@ -152,7 +152,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_setGroupKick", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupKick(int authCode, long groupId, long qqId, bool refuses)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GroupMgr&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GroupMgr";
             JObject data = new JObject
             {
                 {"ActionType",3},
@@ -173,7 +173,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_setGroupBan", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupBan(int authCode, long groupId, long qqId, long time)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=OidbSvc.0x570_8&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=OidbSvc.0x570_8";
             JObject data = new JObject
             {
                 {"GroupID",groupId},
@@ -200,7 +200,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_setGroupSpecialTitle", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupSpecialTitle(int authCode, long groupId, long qqId, IntPtr title, long durationTime)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=OidbSvc.0x8fc_2&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=OidbSvc.0x8fc_2";
             JObject data = new JObject
             {
                 {"GroupID",groupId},
@@ -220,7 +220,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_setGroupWholeBan", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupWholeBan(int authCode, long groupId, bool isOpen)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=OidbSvc.0x89a_0&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=OidbSvc.0x89a_0";
             JObject data = new JObject
             {
                 {"GroupID",groupId},
@@ -253,7 +253,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_setGroupCard", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupCard(int authCode, long groupId, long qqId, IntPtr newCard)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=ModifyGroupCard&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=ModifyGroupCard";
             JObject data = new JObject
             {
                 {"GroupID",groupId},
@@ -273,7 +273,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_setGroupLeave", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setGroupLeave(int authCode, long groupId, bool isDisband)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GroupMgr&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GroupMgr";
             JObject data = new JObject
             {
                 {"ActionType",2},
@@ -308,7 +308,7 @@ namespace CQP
         {
             Requests request = Requests.First(x => x.type == "FriendRequest");
             Requests.Remove(request);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=DealFriend&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=DealFriend";
             JToken data = JObject.Parse(request.json)["CurrentPacket"]["Data"]["EventData"];
             data["Action"] = requestType == 1 ? 2 : 3;
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
@@ -327,7 +327,7 @@ namespace CQP
         {
             Requests request = Requests.First(x => x.type == "GroupRequest");
             Requests.Remove(request);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=DealFriend&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=DealFriend";
             JToken data = JObject.Parse(request.json)["CurrentPacket"]["Data"]["EventData"];
             //JObject data = new JObject
             //{
@@ -376,7 +376,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_getGroupMemberInfoV2", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getGroupMemberInfoV2(int authCode, long groupId, long qqId, bool isCache)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=friendlist.GetTroopMemberListReq&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=friendlist.GetTroopMemberListReq";
             JObject data = new JObject
             {
                 {"GroupUin",groupId},
@@ -414,7 +414,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_getGroupMemberList", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getGroupMemberList(int authCode, long groupId)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=friendlist.GetTroopMemberListReq&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=friendlist.GetTroopMemberListReq";
             JObject data = new JObject
             {
                 {"GroupUin",0},
@@ -454,7 +454,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_getGroupList", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getGroupList(int authCode)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetGroupList&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetGroupList";
             JObject data = new JObject
             {
                 {"NextToken",""}
@@ -517,7 +517,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_getGroupInfo", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getGroupInfo(int authCode, long groupId, bool notCache)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetGroupList&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetGroupList";
             JObject data = new JObject
             {
                 {"NextToken",""}
@@ -541,7 +541,7 @@ namespace CQP
         [DllExport(ExportName = "CQ_getFriendList", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getFriendList(int authCode, bool reserved)
         {
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetQQUserList&timeout=10";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=GetQQUserList";
             JObject data = new JObject
             {
                 {"StartIndex",""}

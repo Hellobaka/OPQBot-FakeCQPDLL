@@ -13,6 +13,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Linq;
 using Launcher.Sdk.Cqp.Core;
+using System.Text;
 
 namespace CQP
 {
@@ -20,10 +21,12 @@ namespace CQP
     {
         static List<AppInfo> appInfos = new List<AppInfo>();
         static List<Requests> Requests = new List<Requests>();
+        static Encoding GB18030 = Encoding.GetEncoding("GB18030");
+
         [DllExport(ExportName = "CQ_sendGroupMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
-            string text = Marshal.PtrToStringAnsi(msg);
+            string text = msg.ToString(GB18030);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2";
             List<CQCode> cqCodeList = CQCode.Parse(text);
             JObject data = new JObject
@@ -33,14 +36,14 @@ namespace CQP
             };
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
-            WebAPI.SendRequest(url, data.ToString(),pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{Marshal.PtrToStringAnsi(msg)}", CQLogLevel.InfoSend);
-            return Save.MsgList.Count+1;
+            WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
+            return Save.MsgList.Count + 1;
         }
 
         [DllExport(ExportName = "CQ_sendPrivateMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_sendPrivateMsg(int authCode, long qqId, IntPtr msg)
         {
-            string text = Marshal.PtrToStringAnsi(msg);
+            string text = msg.ToString(GB18030);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2";
             List<CQCode> cqCodeList = CQCode.Parse(text);
             JObject data = new JObject
@@ -50,7 +53,7 @@ namespace CQP
             };
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"QQ:{qqId} 消息:{Marshal.PtrToStringAnsi(msg)}", CQLogLevel.InfoSend);
+            WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"QQ:{qqId} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
             return 0;
         }
 
@@ -129,11 +132,11 @@ namespace CQP
         public static IntPtr CQ_getAppDirectory(int authCode)
         {
             string appid = appInfos.Find(x => x.AuthCode == authCode).Id;
-            if (!Directory.Exists("data\\app\\"+appid))
-                Directory.CreateDirectory("data\\app\\"+appid);
+            if (!Directory.Exists("data\\app\\" + appid))
+                Directory.CreateDirectory("data\\app\\" + appid);
             string path = "data\\app\\" + appid;
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            return Marshal.StringToHGlobalAnsi(directoryInfo.FullName+"\\");
+            return Marshal.StringToHGlobalAnsi(directoryInfo.FullName + "\\");
         }
 
         [DllExport(ExportName = "CQ_getLoginQQ", CallingConvention = CallingConvention.StdCall)]
@@ -145,8 +148,8 @@ namespace CQP
         [DllExport(ExportName = "CQ_getLoginNick", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getLoginNick(int authCode)
         {
-            FriendsList friendsList =JsonConvert.DeserializeObject<FriendsList>( WebAPI.GetFriendList());
-            return Marshal.StringToHGlobalAnsi(friendsList.List.Where(x=>x.FriendUin==Save.curentQQ).FirstOrDefault().NickName);
+            FriendsList friendsList = JsonConvert.DeserializeObject<FriendsList>(WebAPI.GetFriendList());
+            return Marshal.StringToHGlobalAnsi(friendsList.List.Where(x => x.FriendUin == Save.curentQQ).FirstOrDefault().NickName);
         }
 
         [DllExport(ExportName = "CQ_setGroupKick", CallingConvention = CallingConvention.StdCall)]
@@ -161,9 +164,9 @@ namespace CQP
                 {"Content","" }
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
-            int state=Convert.ToInt32(ret["Ret"].ToString());
-            string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;            
-            if(state==0)
+            int state = Convert.ToInt32(ret["Ret"].ToString());
+            string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
+            if (state == 0)
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群踢人", $"从群{groupId} 踢出了{qqId}");
             else
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群踢人", $"调用异常，信息{ret["Msg"]}");
@@ -184,7 +187,7 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群禁言", $"在群{groupId} 禁言了{qqId} {time/60}分钟");
+                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群禁言", $"在群{groupId} 禁言了{qqId} {time / 60}分钟");
             else
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群禁言", $"调用异常，信息未知");
             return state;
@@ -205,7 +208,7 @@ namespace CQP
             {
                 {"GroupID",groupId},
                 {"UserID",qqId},
-                {"NewTitle",Marshal.PtrToStringAnsi(title)}
+                {"NewTitle",title.ToString(GB18030)}
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
             int state = Convert.ToInt32(ret["Ret"].ToString());
@@ -230,7 +233,7 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "全员禁言", $"在群{groupId} {(isOpen?"开启":"关闭")}了全员禁言");
+                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "全员禁言", $"在群{groupId} {(isOpen ? "开启" : "关闭")}了全员禁言");
             else
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "全员禁言", $"调用异常，信息未知");
             return state;
@@ -258,13 +261,13 @@ namespace CQP
             {
                 {"GroupID",groupId},
                 {"UserID",qqId},
-                {"NewNick",Marshal.PtrToStringAnsi(newCard)}
+                {"NewNick",newCard.ToString(GB18030)}
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
-            int state = Convert.ToInt32(ret["GroupID"].ToString()!="0"?0:-1);
+            int state = Convert.ToInt32(ret["GroupID"].ToString() != "0" ? 0 : -1);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群名片修改", $"在群{groupId} 修改{qqId}的群名片为{Marshal.PtrToStringAnsi(newCard)}");
+                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群名片修改", $"在群{groupId} 修改{qqId}的群名片为{newCard.ToString(GB18030)}");
             else
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群名片修改", $"调用异常，信息未知");
             return state;
@@ -316,7 +319,7 @@ namespace CQP
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "处理好友请求", $"{(requestType == 1 ? "同意" : "拒绝")}了" +
-                    $"好友{Convert.ToInt64(data["UserID"].ToString())}的请求"); 
+                    $"好友{Convert.ToInt64(data["UserID"].ToString())}的请求");
             else
                 CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "处理好友请求", $"调用异常，信息{ret["Msg"]}");
             return state;
@@ -362,7 +365,7 @@ namespace CQP
         public static int CQ_addLog(int authCode, int priority, IntPtr type, IntPtr msg)
         {
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            CoreHelper.WriteLine(pluginname,priority, Marshal.PtrToStringAnsi(type), Marshal.PtrToStringAnsi(msg));
+            CoreHelper.WriteLine(pluginname, priority, type.ToString(GB18030), msg.ToString(GB18030));
             return 0;
         }
 
@@ -370,7 +373,7 @@ namespace CQP
         public static int CQ_setFatal(int authCode, IntPtr errorMsg)
         {
             //待找到实现方法
-            throw new Exception(Marshal.PtrToStringAnsi(errorMsg));
+            throw new Exception(errorMsg.ToString(GB18030));
         }
 
         [DllExport(ExportName = "CQ_getGroupMemberInfoV2", CallingConvention = CallingConvention.StdCall)]
@@ -384,8 +387,8 @@ namespace CQP
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
             JArray array = JArray.Parse(ret["MemberList"].ToString());
-            JToken targetuser=null;
-            foreach(var item in array)
+            JToken targetuser = null;
+            foreach (var item in array)
             {
                 if (item["MemberUin"].ToString() == qqId.ToString())
                 { targetuser = item; break; }
@@ -464,7 +467,7 @@ namespace CQP
             BinaryWriter binaryWriterMain = new BinaryWriter(streamMain);//最终要进行编码的字节流
             JArray grouplist = JArray.Parse(ret["TroopList"].ToString());
             BinaryWriterExpand.Write_Ex(binaryWriterMain, grouplist.Count);//群数量
-            foreach(var item in grouplist)
+            foreach (var item in grouplist)
             {
                 MemoryStream stream = new MemoryStream();
                 BinaryWriter binaryWriter = new BinaryWriter(stream);//临时字节流,用于统计每个群信息的字节数量
@@ -500,15 +503,15 @@ namespace CQP
         [DllExport(ExportName = "CQ_getImage", CallingConvention = CallingConvention.StdCall)]
         public static IntPtr CQ_getImage(int authCode, IntPtr file)
         {
-            string filename= Marshal.PtrToStringAnsi(file);
+            string filename = file.ToString(GB18030);
             string path = $"data\\image\\{filename}.cqimg";
             IniConfig ini = new IniConfig(path);
             ini.Object.Add(new ISection("image"));
-            string picurl= ini.Object["image"]["url"];            
-            if (!File.Exists($"data\\image\\"+ filename + ".cqimg"))
+            string picurl = ini.Object["image"]["url"];
+            if (!File.Exists($"data\\image\\" + filename + ".cqimg"))
             {
                 HttpWebClient http = new HttpWebClient { TimeOut = 10000 };
-                http.DownloadFile(picurl, $"data\\image\\{filename}.jpg"); 
+                http.DownloadFile(picurl, $"data\\image\\{filename}.jpg");
             }
             FileInfo fileInfo = new FileInfo($"data\\image\\{filename}.jpg");
             return Marshal.StringToHGlobalAnsi(fileInfo.FullName);
@@ -524,7 +527,7 @@ namespace CQP
             };
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
             JArray array = JArray.Parse(ret["TroopList"].ToString());
-            JToken targetgroup=null;
+            JToken targetgroup = null;
             foreach (var item in array)
             {
                 if (item["GroupId"].ToString() == groupId.ToString())
@@ -567,9 +570,9 @@ namespace CQP
             return Marshal.StringToHGlobalAnsi(Convert.ToBase64String(streamMain.ToArray()));
         }
         [DllExport(ExportName = "cq_start", CallingConvention = CallingConvention.StdCall)]
-        public static bool cq_start(IntPtr path,int authcode)
+        public static bool cq_start(IntPtr path, int authcode)
         {
-            string pathtext = Marshal.PtrToStringAnsi(path);
+            string pathtext = path.ToString(GB18030);
             JsonLoadSettings loadsetting = new JsonLoadSettings
             {
                 CommentHandling = CommentHandling.Ignore
@@ -579,7 +582,7 @@ namespace CQP
             KeyValuePair<int, string> appinfotext = dllHelper.GetAppInfo();
             AppInfo appInfo = new AppInfo(appinfotext.Value, 0, appinfotext.Key
                 , jObject["name"].ToString(), jObject["version"].ToString(), Convert.ToInt32(jObject["version_id"].ToString())
-                , jObject["author"].ToString(), jObject["description"].ToString(),authcode);
+                , jObject["author"].ToString(), jObject["description"].ToString(), authcode);
             appInfos.Add(appInfo);
             return true;
         }

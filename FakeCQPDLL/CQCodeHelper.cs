@@ -17,41 +17,44 @@ namespace CQP
     {
         public static void Progeress(List<CQCode> cqCodeList, ref JObject data, ref string text)
         {
-            bool Picflag = false, Voiceflag = false;
-            //List<long> atQQs = new List<long>();
+            bool Picflag = text.Contains("[CQ:image"), Voiceflag = text.Contains("[CQ:record");
+            string contentSectionName = "Content";
+            if (Picflag || Voiceflag)
+                contentSectionName = "content";
             foreach (var item in cqCodeList)
             {
                 switch (item.Function)
                 {
                     case CQFunction.At://[CQ:at,qq=xxxx]
                         {
-                            if (!data.ContainsKey("Content")) data.Add("Content", "");
+                            if (!data.ContainsKey(contentSectionName)) data.Add(contentSectionName, "");
                             text = text.Replace(item.ToSendString(), $"[ATUSER({Convert.ToInt64(item.Items["qq"])})]");
-                            //atQQs.Add(Convert.ToInt64(item.Items["qq"]));
-                            //Atflag = true;
                             break;
                         }
                     case CQFunction.Image:
                         {
-                            if (!data.ContainsKey("Content")) data.Add("Content", "");
-                            if (!data.ContainsKey("PicPath")) data.Add("PicPath", "");
+                            if (!data.ContainsKey("content")) data.Add("content", "");
+                            if (!data.ContainsKey("picBase64Buf")) data.Add("picBase64Buf", "");
+                            if (!data.ContainsKey("picUrl")) data.Add("picUrl", "");
+                            if (!data.ContainsKey("atUser")) data.Add("atUser", 0);
+                            if (!data.ContainsKey("fileMd5")) data.Add("fileMd5", "");
                             if (item.Items.ContainsKey("url"))
-                                data["PicUrl"] = item.Items["url"];
+                                data["picUrl"] = item.Items["url"];
                             else if (item.Items.ContainsKey("file"))
                             {
                                 if (File.Exists("data\\image\\" + item.Items["file"] + ".cqimg"))
                                 {
                                     IniConfig ini = new IniConfig("data\\image\\" + item.Items["file"] + ".cqimg"); ini.Load();
-                                    data["PicUrl"] = ini.Object["image"]["url"].ToString();
+                                    data["picUrl"] = ini.Object["image"]["url"].ToString();
                                     Picflag = true;
                                     break;
                                 }
-                                string path = item.Items["file"];
+                                string path = item.Items["file"], base64buf = string.Empty;
                                 if (File.Exists("data\\image\\" + path))
                                 {
-                                    string PicFullPath = new FileInfo("data\\image\\" + path).FullName;
-                                    data["PicPath"] = $"/mnt/{WindowsPath2LinuxPath(PicFullPath)}";
+                                    base64buf = BinaryReaderExpand.ImageToBase64("data\\image\\" + path);
                                 }
+                                data["picBase64Buf"] = base64buf;
                             }
                             else if (item.Items.ContainsKey("md5"))
                             {
@@ -63,18 +66,19 @@ namespace CQP
                         }
                     case CQFunction.Record:
                         {
-                            if (!data.ContainsKey("Content")) data.Add("Content", "");
+                            if (!data.ContainsKey("content")) data.Add("content", "");
+                            if (!data.ContainsKey("voiceBase64Buf")) data.Add("voiceBase64Buf", "");
+                            if (!data.ContainsKey("voiceUrl")) data.Add("voiceUrl", "");
+                            if (!data.ContainsKey("atUser")) data.Add("atUser", 0);
                             if (item.Items.ContainsKey("file"))
                             {
-                                if (!data.ContainsKey("VoicePath")) data.Add("VoicePath", "");
                                 string voicepath = $"data\\record\\{item.Items["file"]}";
                                 if (File.Exists(voicepath))
                                 {
                                     try
                                     {
-                                        if (!data.ContainsKey("VoiceUrl")) data.Add("VoiceUrl", "");
                                         IniConfig ini = new IniConfig(voicepath); ini.Load();
-                                        data["VoiceUrl"] = ini.Object["record"]["url"].ToString();
+                                        data["voiceUrl"] = ini.Object["record"]["url"].ToString();
                                     }
                                     catch
                                     {
@@ -85,7 +89,15 @@ namespace CQP
                                                 voicepath = voicepath.Replace(extension, ".silk");
                                         }
                                         voicepath = new FileInfo(voicepath).FullName;
-                                        data["VoicePath"] = $"/mnt/{WindowsPath2LinuxPath(voicepath)}";
+                                        string base64Str;
+                                        using (FileStream fsRead = new FileStream(voicepath, FileMode.Open))
+                                        {
+                                            int fsLen = (int)fsRead.Length;
+                                            byte[] heByte = new byte[fsLen];
+                                            int r = fsRead.Read(heByte, 0, heByte.Length);
+                                            base64Str = Convert.ToBase64String(heByte);
+                                        }
+                                        data["voiceBase64Buf"] = base64Str;
                                     }
                                     Voiceflag = true;
                                 }
@@ -106,11 +118,11 @@ namespace CQP
                 }
             }
             string filtered = Regex.Replace(text, @"\[CQ.*\]", "");
-            if (!string.IsNullOrEmpty(filtered)) data["Content"] = filtered;
+            if (!string.IsNullOrEmpty(filtered)) data[contentSectionName] = filtered;
             if (Picflag)
-                data.Add("SendMsgType", "PicMsg");
+                data.Add("sendMsgType", "PicMsg");
             else if (Voiceflag)
-                data.Add("SendMsgType", "VoiceMsg");
+                data.Add("sendMsgType", "VoiceMsg");
             else
                 data.Add("SendMsgType", "TextMsg");
         }

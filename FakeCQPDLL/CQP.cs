@@ -27,13 +27,29 @@ namespace CQP
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
             string text = msg.ToString(GB18030);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg";
+            JObject data;
             List<CQCode> cqCodeList = CQCode.Parse(text);
-            JObject data = new JObject
+            if (text.Contains("[CQ:image") || text.Contains("[CQ:record"))
             {
-                {"ToUserUid",groupid},
-                {"SendToType",2}
-            };
+                data = new JObject
+                {
+                    {"toUser",groupid},
+                    {"sendToType",2},
+                    {"groupid",0},
+                    {"fileMd5","" },
+                    {"atUser",0 }
+                };
+            }
+            else
+            {
+                url += "V2";
+                data = new JObject
+                {
+                    {"ToUserUid",groupid},
+                    {"SendToType",2}
+                };
+            }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
             WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
@@ -44,13 +60,29 @@ namespace CQP
         public static int CQ_sendPrivateMsg(int authCode, long qqId, IntPtr msg)
         {
             string text = msg.ToString(GB18030);
-            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsgV2";
+            string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg";
+            JObject data;
             List<CQCode> cqCodeList = CQCode.Parse(text);
-            JObject data = new JObject
+            if (text.Contains("[CQ:image"))
             {
-                {"ToUserUid",qqId},
-                {"SendToType",1}
-            };
+                data = new JObject
+                {
+                    {"toUser",qqId},
+                    {"sendToType",1},
+                    {"groupid",0},
+                    {"fileMd5","" },
+                    {"atUser",0 }
+                };
+            }
+            else
+            {
+                url += "V2";
+                data = new JObject
+                {
+                    {"ToUserUid",qqId},
+                    {"SendToType",1}
+                };
+            }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"QQ:{qqId} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);

@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using Launcher.Sdk.Cqp.Core;
 using System.Text;
+using System.Drawing;
 
 namespace CQP
 {
@@ -27,6 +28,7 @@ namespace CQP
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
             string text = msg.ToString(GB18030);
+            string textBackup = msg.ToString(GB18030);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg";
             JObject data;
             List<CQCode> cqCodeList = CQCode.Parse(text);
@@ -52,8 +54,20 @@ namespace CQP
             }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
-            WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
-            return Save.MsgList.Count + 1;
+            if (Save.TestPluginsList.Any(x => x == pluginname))
+            {
+                Save.TestPluginChatter.Invoke(new System.Windows.Forms.MethodInvoker(()=>
+                {
+                    Save.TestPluginChatter.SelectionColor = Color.Green;
+                    Save.TestPluginChatter.AppendText($"[{DateTime.Now:HH:mm:ss}] 插件发送消息: {textBackup}\n");
+                }));
+                return 0;
+            }
+            else
+            {
+                WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
+                return Save.MsgList.Count + 1;
+            }
         }
 
         [DllExport(ExportName = "CQ_sendPrivateMsg", CallingConvention = CallingConvention.StdCall)]

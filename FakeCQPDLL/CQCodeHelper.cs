@@ -131,41 +131,41 @@ namespace CQP
         {
             if (!Directory.Exists("tools"))
             {
-                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools目录丢失，无法继续");
+                LogHelper.WriteLog((int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools目录丢失，无法继续");
                 return false;
             }
             if (!File.Exists(@"tools\silk_v3_encoder.exe"))
             {
-                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools\\silk_v3_encoder.exe 文件丢失，无法继续");
+                LogHelper.WriteLog((int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools\\silk_v3_encoder.exe 文件丢失，无法继续");
                 return false;
             }
             if (!File.Exists(@"tools\ffmpeg.exe"))
             {
-                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools\\ffmpeg.exe 文件丢失，无法继续");
+                LogHelper.WriteLog((int)CQLogLevel.Error, "音频格式转换", "工具丢失", "...", "tools\\ffmpeg.exe 文件丢失，无法继续");
                 return false;
             }
             string output;
             RunCMDCommand($"tools\\ffmpeg.exe -y -i \"{voicepath}\" -f s16le -ar 24000 -ac 1 \"{voicepath.Replace(extension, ".pcm")}\"", out output);
-            if (!Directory.Exists("logs"))
-                Directory.CreateDirectory("logs");
-            string filePath = "logs\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_pcm.log";
+            if (!Directory.Exists("logs\\audiologs"))
+                Directory.CreateDirectory("logs\\audiologs");
+            string filePath = "logs\\audiologs\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_pcm.log";
             IniConfig ini = new IniConfig(filePath);
             ini.Object.Add(new Native.Tool.IniConfig.Linq.ISection("OutPut"));
             ini.Object["OutPut"]["Details"] = new Native.Tool.IniConfig.Linq.IValue(output);
             ini.Save();
             if (output.Contains("Invalid data found when processing input"))
             {
-                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "格式错误", "...", "接受的音频可能不是FFmpeg可转换的格式");
+                LogHelper.WriteLog((int)CQLogLevel.Error, "音频格式转换", "格式错误", "...", "接受的音频可能不是FFmpeg可转换的格式");
                 return false;
             }
             if (!output.Contains("video:0kB"))
             {
-                CoreHelper.LogWriter(Save.logListView, (int)CQLogLevel.Error, "音频格式转换", "未知错误", "...", $"FFmpeg输出已保存至{filePath}");
+                LogHelper.WriteLog((int)CQLogLevel.Error, "音频格式转换", "未知错误", "...", $"FFmpeg输出已保存至{filePath}");
                 return false;
             }
             string filepath = voicepath.Replace(extension, ".pcm");
             RunCMDCommand($"tools\\silk_v3_encoder.exe \"{filepath}\" \"{filepath.Replace(".pcm", ".silk")}\" -tencent -quiet", out output);
-            filePath = "logs\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_silk.log";
+            filePath = "logs\\audiologs\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_silk.log";
             ini = new IniConfig(filePath);
             ini.Object.Add(new Native.Tool.IniConfig.Linq.ISection("OutPut"));
             ini.Object["OutPut"]["Details"] = new Native.Tool.IniConfig.Linq.IValue(output);

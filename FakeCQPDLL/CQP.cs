@@ -56,7 +56,7 @@ namespace CQP
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
             if (Save.TestPluginsList.Any(x => x == pluginname))
             {
-                Save.TestPluginChatter.Invoke(new System.Windows.Forms.MethodInvoker(()=>
+                Save.TestPluginChatter.Invoke(new System.Windows.Forms.MethodInvoker(() =>
                 {
                     Save.TestPluginChatter.SelectionColor = Color.Green;
                     Save.TestPluginChatter.AppendText($"[{DateTime.Now:HH:mm:ss}] 插件发送消息: {textBackup}\n");
@@ -120,9 +120,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "撤回消息", $"群:{message.groupid} QQ:{{保留参数}} 消息:{message.text}");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "撤回消息", $"群:{message.groupid} QQ:{{保留参数}} 消息:{message.text}");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "撤回消息", $"调用异常，信息{ret["Msg"]}");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "撤回消息", $"调用异常，信息{ret["Msg"]}");
             return state;
         }
         [DllExport(ExportName = "AddMsgToSave", CallingConvention = CallingConvention.StdCall)]
@@ -143,9 +143,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "发送赞", $"向{qqId}发送了一个赞");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "发送赞", $"向{qqId}发送了一个赞");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "发送赞", $"调用异常，信息{ret["Msg"]}");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "发送赞", $"调用异常，信息{ret["Msg"]}");
             return state;
         }
 
@@ -156,7 +156,7 @@ namespace CQP
             JObject data = new JObject();
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "获取cookie", $"已获取个人cookie");
+            LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "获取cookie", $"已获取个人cookie");
             return Marshal.StringToHGlobalAnsi(ret["cookies"].ToString());
         }
 
@@ -213,9 +213,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群踢人", $"从群{groupId} 踢出了{qqId}");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "群踢人", $"从群{groupId} 踢出了{qqId}");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群踢人", $"调用异常，信息{ret["Msg"]}");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "群踢人", $"调用异常，信息{ret["Msg"]}");
             return state;
         }
 
@@ -233,9 +233,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群禁言", $"在群{groupId} 禁言了{qqId} {time / 60}分钟");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "群禁言", $"在群{groupId} 禁言了{qqId} {time / 60}分钟");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群禁言", $"调用异常，信息未知");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "群禁言", $"调用异常，信息未知");
             return state;
         }
 
@@ -260,9 +260,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群头衔发放", $"在群{groupId} 给{qqId} 发放头衔{title}");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "群头衔发放", $"在群{groupId} 给{qqId} 发放头衔{title}");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群头衔发放", $"调用异常，信息未知");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "群头衔发放", $"调用异常，信息未知");
             return state;
         }
 
@@ -279,9 +279,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "全员禁言", $"在群{groupId} {(isOpen ? "开启" : "关闭")}了全员禁言");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "全员禁言", $"在群{groupId} {(isOpen ? "开启" : "关闭")}了全员禁言");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "全员禁言", $"调用异常，信息未知");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "全员禁言", $"调用异常，信息未知");
             return state;
         }
 
@@ -313,9 +313,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["GroupID"].ToString() != "0" ? 0 : -1);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "群名片修改", $"在群{groupId} 修改{qqId}的群名片为{newCard.ToString(GB18030)}");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "群名片修改", $"在群{groupId} 修改{qqId}的群名片为{newCard.ToString(GB18030)}");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "群名片修改", $"调用异常，信息未知");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "群名片修改", $"调用异常，信息未知");
             return state;
         }
 
@@ -334,9 +334,9 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "退群", $"退出了群{groupId}");
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "退群", $"退出了群{groupId}");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "退群", $"调用异常，信息{ret["Msg"]}");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "退群", $"调用异常，信息{ret["Msg"]}");
             return state;
         }
 
@@ -364,10 +364,10 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "处理好友请求", $"{(requestType == 1 ? "同意" : "拒绝")}了" +
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "处理好友请求", $"{(requestType == 1 ? "同意" : "拒绝")}了" +
                     $"好友{Convert.ToInt64(data["UserID"].ToString())}的请求");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "处理好友请求", $"调用异常，信息{ret["Msg"]}");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "处理好友请求", $"调用异常，信息{ret["Msg"]}");
             return state;
         }
 
@@ -399,25 +399,34 @@ namespace CQP
             int state = Convert.ToInt32(ret["Ret"].ToString());
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
             if (state == 0)
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.InfoSuccess, "处理加群请求", $"{(responseType == 1 ? "同意" : "拒绝")}了" +
+                LogHelper.WriteLog(LogLevel.InfoSuccess, pluginname, "处理加群请求", $"{(responseType == 1 ? "同意" : "拒绝")}了" +
                     $"QQ{Convert.ToInt64(data["UserID"].ToString())}" +
                     $"对群{Convert.ToInt64(data["FromGroupId"].ToString())}的请求");
             else
-                CoreHelper.WriteLine(pluginname, (int)CQLogLevel.Error, "处理加群请求", $"调用异常，信息{ret["Msg"]}");
+                LogHelper.WriteLog(LogLevel.Error, pluginname, "处理加群请求", $"调用异常，信息{ret["Msg"]}");
             return state;
         }
 
         [DllExport(ExportName = "CQ_addLog", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_addLog(int authCode, int priority, IntPtr type, IntPtr msg)
         {
-            string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            CoreHelper.WriteLine(pluginname, priority, type.ToString(GB18030), msg.ToString(GB18030));
+            if (authCode == 0)
+            {
+                LogHelper.WriteLog(priority, "OPQBot框架", type.ToString(GB18030), msg.ToString(GB18030));
+            }
+            else
+            {
+                string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
+                LogHelper.WriteLog(priority, pluginname, type.ToString(GB18030),"", msg.ToString(GB18030));
+            }
             return 0;
         }
 
         [DllExport(ExportName = "CQ_setFatal", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_setFatal(int authCode, IntPtr errorMsg)
         {
+            string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
+            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", "", errorMsg.ToString(GB18030));
             //待找到实现方法
             throw new Exception(errorMsg.ToString(GB18030));
         }

@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deserizition", "..\OPQBot-N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketIOClient", "..\OPQBot-Native\SocketIO\SocketIOClient.csproj", "{352C9BC1-F74C-4741-A09D-7227BC60C057}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lancher.Sdk", "..\OPQBot-Native\Sdk\Lancher.Sdk.csproj", "{D7A958B3-79D9-49F8-8BB4-9619BAB6ECBA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher.Sdk", "..\OPQBot-Native\Sdk\Launcher.Sdk.csproj", "{D7A958B3-79D9-49F8-8BB4-9619BAB6ECBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

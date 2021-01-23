@@ -1,5 +1,4 @@
 ﻿using Deserizition;
-using Launcher.Sdk.Cqp.Enum;
 using Launcher.Sdk.Cqp.Expand;
 using Launcher.Sdk.Cqp.Model;
 using Tool.Http;
@@ -15,6 +14,7 @@ using System.Linq;
 using Launcher.Sdk.Cqp.Core;
 using System.Text;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace CQP
 {
@@ -27,6 +27,8 @@ namespace CQP
         [DllExport(ExportName = "CQ_sendGroupMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Restart();
             string text = msg.ToString(GB18030);
             string textBackup = msg.ToString(GB18030);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg";
@@ -54,6 +56,7 @@ namespace CQP
             }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
+            int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", "处理中...");
             if (Save.TestPluginsList.Any(x => x == pluginname))
             {
                 Save.TestPluginChatter.Invoke(new System.Windows.Forms.MethodInvoker(() =>
@@ -65,7 +68,9 @@ namespace CQP
             }
             else
             {
-                WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
+                WebAPI.SendRequest(url, data.ToString());
+                sw.Stop();
+                LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds} ms");
                 return Save.MsgList.Count + 1;
             }
         }
@@ -73,6 +78,8 @@ namespace CQP
         [DllExport(ExportName = "CQ_sendPrivateMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_sendPrivateMsg(int authCode, long qqId, IntPtr msg)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             string text = msg.ToString(GB18030);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=SendMsg";
             JObject data;
@@ -99,14 +106,16 @@ namespace CQP
             }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            WebAPI.SendRequest(url, data.ToString(), pluginname, "[↑]发送消息", $"QQ:{qqId} 消息:{msg.ToString(GB18030)}", CQLogLevel.InfoSend);
+            int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送好友消息", $"QQ:{qqId} 消息:{msg.ToString(GB18030)}", "处理中...");
+            WebAPI.SendRequest(url, data.ToString());
+            sw.Stop();
+            LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds} ms");
             return 0;
         }
 
         [DllExport(ExportName = "CQ_deleteMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_deleteMsg(int authCode, long msgId)
         {
-            var p = Save.MsgList;
             var c = Save.MsgList.Find(x => x.MsgId == msgId);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=RevokeMsg";
             JObject data = new JObject
@@ -378,22 +387,6 @@ namespace CQP
             Requests.Remove(request);
             string url = $@"{Save.url}v1/LuaApiCaller?qq={Save.curentQQ}&funcname=DealFriend";
             JToken data = JObject.Parse(request.json)["CurrentPacket"]["Data"]["EventData"];
-            //JObject data = new JObject
-            //{
-            //    {"Seq",Convert.ToInt64(request_Des["Seq"].ToString())},
-            //    {"Type",Convert.ToInt64(request_Des["Type"].ToString())},
-            //    {"MsgTypeStr",request_Des["MsgTypeStr"].ToString()},
-            //    {"Who",Convert.ToInt64(request_Des["Who"].ToString())},
-            //    {"WhoName",request_Des["WhoName"].ToString()},
-            //    {"MsgStatusStr",request_Des["MsgStatusStr"].ToString()},
-            //    {"Flag_7",Convert.ToInt64(request_Des["Flag_7"].ToString())},
-            //    {"Flag_8",Convert.ToInt64(request_Des["Flag_8"].ToString())},
-            //    {"GroupId",Convert.ToInt64(request_Des["GroupId"].ToString())},
-            //    {"GroupName",request_Des["GroupName"].ToString()},
-            //    {"InviteUin",Convert.ToInt64(request_Des["InviteUin"].ToString())},
-            //    {"InviteName",request_Des["InviteName"].ToString()},
-            //    {"Action",responseType==1?11:21},
-            //};
             data["Action"] = responseType == 1 ? 11 : 21;
             JObject ret = JsonConvert.DeserializeObject<JObject>(SendRequest(url, data.ToString()));
             int state = Convert.ToInt32(ret["Ret"].ToString());
@@ -417,7 +410,7 @@ namespace CQP
             else
             {
                 string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-                LogHelper.WriteLog(priority, pluginname, type.ToString(GB18030),"", msg.ToString(GB18030));
+                LogHelper.WriteLog(priority, pluginname, type.ToString(GB18030), msg.ToString(GB18030));
             }
             return 0;
         }
@@ -426,7 +419,7 @@ namespace CQP
         public static int CQ_setFatal(int authCode, IntPtr errorMsg)
         {
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", "", errorMsg.ToString(GB18030));
+            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", errorMsg.ToString(GB18030));
             //待找到实现方法
             throw new Exception(errorMsg.ToString(GB18030));
         }

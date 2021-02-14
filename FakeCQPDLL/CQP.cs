@@ -56,7 +56,6 @@ namespace CQP
             }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authcode).Name;
-            int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", "处理中...");
             if (Save.TestPluginsList.Any(x => x == pluginname))
             {
                 Save.TestPluginChatter.Invoke(new System.Windows.Forms.MethodInvoker(() =>
@@ -68,9 +67,10 @@ namespace CQP
             }
             else
             {
+                int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", "处理中...");
                 WebAPI.SendRequest(url, data.ToString());
                 sw.Stop();
-                LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds} ms");
+                LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds/ (double)1000:f2} s");
                 return Save.MsgList.Count + 1;
             }
         }
@@ -109,7 +109,7 @@ namespace CQP
             int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送好友消息", $"QQ:{qqId} 消息:{msg.ToString(GB18030)}", "处理中...");
             WebAPI.SendRequest(url, data.ToString());
             sw.Stop();
-            LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds} ms");
+            LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds/ (double)1000:f2} s");
             return 0;
         }
 

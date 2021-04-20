@@ -419,7 +419,7 @@ namespace CQP
         public static int CQ_setFatal(int authCode, IntPtr errorMsg)
         {
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", errorMsg.ToString(GB18030));
+            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", errorMsg.ToString(GB18030),"");
             //待找到实现方法
             throw new Exception(errorMsg.ToString(GB18030));
         }

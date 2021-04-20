@@ -169,16 +169,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OPQBot-Native\Deserizition\Deserizition.csproj">
-      <Project>{18CC2E4A-E049-4A31-8A52-0000371A558B}</Project>
+      <Project>{18cc2e4a-e049-4a31-8a52-0000371a558b}</Project>
       <Name>Deserizition</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\OPQBot-Native\Sdk\Launcher.Sdk.csproj">
       <Project>{d7a958b3-79d9-49f8-8bb4-9619bab6ecba}</Project>
       <Name>Launcher.Sdk</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\OPQBot-Native\SocketIO\SocketIOClient.csproj">
-      <Project>{352C9BC1-F74C-4741-A09D-7227BC60C057}</Project>
-      <Name>SocketIOClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tool\Tool.csproj">
       <Project>{0ca93eb9-4e25-46c6-94d2-0f97137a1606}</Project>

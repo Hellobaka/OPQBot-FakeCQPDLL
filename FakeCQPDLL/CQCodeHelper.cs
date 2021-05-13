@@ -10,9 +10,26 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Deserizition;
+using System.Linq;
 
 namespace CQP
 {
+    public static class Helper
+    {
+        public static long GetIDFirstInGroup(long UID)
+        {
+            return Save.MsgList.First(x => x.userID == UID).tempGroupID;
+        }
+        public static int GetMsgType(long UID)
+        {
+            if (Save.FriendsList.Friendlist.Count(x => x.FriendUin == UID) != 0)
+                return 1;
+            if (GetIDFirstInGroup(UID) == 0)
+                return -1;
+            return 3;
+        }
+    }
+
     public static class CQCodeHelper
     {
         public static void Progeress(List<CQCode> cqCodeList, ref JObject data, ref string text)

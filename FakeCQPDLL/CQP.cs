@@ -27,6 +27,10 @@ namespace CQP
         [DllExport(ExportName = "CQ_sendGroupMsg", CallingConvention = CallingConvention.StdCall)]
         public static int CQ_sendGroupMsg(int authcode, long groupid, IntPtr msg)
         {
+            if (Save.GroupList.TroopList.Any(x => x.GroupId == groupid) is false)
+            {
+                LogHelper.WriteLog(LogLevel.Warning, "消息无法投递", $"此账号未加入群 {groupid} ，无法发送消息");
+            }
             Stopwatch sw = new Stopwatch();
             sw.Restart();
             string text = msg.ToString(GB18030);
@@ -70,7 +74,7 @@ namespace CQP
                 int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送消息", $"群号:{groupid} 消息:{msg.ToString(GB18030)}", "处理中...");
                 WebAPI.SendRequest(url, data.ToString());
                 sw.Stop();
-                LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds/ (double)1000:f2} s");
+                LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds / (double)1000:f2} s");
                 return Save.MsgList.Count + 1;
             }
         }
@@ -101,15 +105,42 @@ namespace CQP
                 data = new JObject
                 {
                     {"ToUserUid",qqId},
-                    {"SendToType",1}
+                    {"SendToType",1},
+                    {"GroupID",0 }
                 };
+            }
+            switch (Helper.GetMsgType(qqId))
+            {
+                case -1:
+                    LogHelper.WriteLog(LogLevel.Warning, "消息无法投递", $"此账号未与 {qqId} 建立任何关系");
+                    return 0;
+                case 1:
+                    break;
+                case 3:
+                    if (data.ContainsKey("sendToType"))
+                    {
+                        data["sendToType"] = 3;
+                        data["groupid"] = Helper.GetIDFirstInGroup(qqId);
+                    }
+                    else
+                    {
+                        data["SendToType"] = 3;
+                        data["GroupID"] = Helper.GetIDFirstInGroup(qqId);
+                    }
+                    break;
+                default:
+                    break;
             }
             CQCodeHelper.Progeress(cqCodeList, ref data, ref text);
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
+            if (WebAPI.SendRequest(url, data.ToString()).Contains("-103"))
+            {
+                LogHelper.WriteLog(LogLevel.Warning, "消息投递失败", "此群禁止临时会话");
+                return 0;
+            }
             int logid = LogHelper.WriteLog(LogLevel.InfoSend, pluginname, "[↑]发送好友消息", $"QQ:{qqId} 消息:{msg.ToString(GB18030)}", "处理中...");
-            WebAPI.SendRequest(url, data.ToString());
             sw.Stop();
-            LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds/ (double)1000:f2} s");
+            LogHelper.UpdateLogStatus(logid, $"√ {sw.ElapsedMilliseconds / (double)1000:f2} s");
             return 0;
         }
 
@@ -204,7 +235,7 @@ namespace CQP
         public static IntPtr CQ_getLoginNick(int authCode)
         {
             FriendsList friendsList = JsonConvert.DeserializeObject<FriendsList>(WebAPI.GetFriendList());
-            return Marshal.StringToHGlobalAnsi(friendsList.List.Where(x => x.FriendUin == Save.curentQQ).FirstOrDefault().NickName);
+            return Marshal.StringToHGlobalAnsi(friendsList.Friendlist.Where(x => x.FriendUin == Save.curentQQ).FirstOrDefault().NickName);
         }
 
         [DllExport(ExportName = "CQ_setGroupKick", CallingConvention = CallingConvention.StdCall)]
@@ -419,7 +450,7 @@ namespace CQP
         public static int CQ_setFatal(int authCode, IntPtr errorMsg)
         {
             string pluginname = appInfos.Find(x => x.AuthCode == authCode).Name;
-            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", errorMsg.ToString(GB18030),"");
+            LogHelper.WriteLog(LogLevel.Fatal, pluginname, "异常抛出", errorMsg.ToString(GB18030), "");
             //待找到实现方法
             throw new Exception(errorMsg.ToString(GB18030));
         }

@@ -584,16 +584,22 @@ namespace CQP
         {
             string filename = file.ToString(GB18030);
             string path = $"data\\image\\{filename}.cqimg";
-            IniConfig ini = new IniConfig(path);
-            ini.Object.Add(new ISection("image"));
-            string picurl = ini.Object["image"]["url"];
-            if (!File.Exists($"data\\image\\" + filename + ".cqimg"))
+            if (File.Exists(path))
             {
+                IniConfig ini = new IniConfig(path);
+                ini.Load();
+                if (ini.Object.ContainsKey("image") is false)
+                    return Marshal.StringToHGlobalAnsi(string.Empty);
+                string picurl = ini.Object["image"]["url"];
                 HttpWebClient http = new HttpWebClient { TimeOut = 10000 };
                 http.DownloadFile(picurl, $"data\\image\\{filename}.jpg");
+                FileInfo fileInfo = new FileInfo($"data\\image\\{filename}.jpg");
+                return Marshal.StringToHGlobalAnsi(fileInfo.FullName);
             }
-            FileInfo fileInfo = new FileInfo($"data\\image\\{filename}.jpg");
-            return Marshal.StringToHGlobalAnsi(fileInfo.FullName);
+            else
+            {
+                return Marshal.StringToHGlobalAnsi(string.Empty);
+            }
         }
 
         [DllExport(ExportName = "CQ_getGroupInfo", CallingConvention = CallingConvention.StdCall)]

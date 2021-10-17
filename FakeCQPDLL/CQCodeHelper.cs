@@ -79,6 +79,8 @@ namespace CQP
                             }
                             Picflag = true;
                             text = Regex.Replace(text, @"\[CQ:image,.*?\]", "[PICFLAG]");
+                            if (text == "[PICFLAG]")
+                                text = "";
                             break;
                         }
                     case CQFunction.Record:
